@@ -41,7 +41,7 @@ class HomeController extends GetxController {
 
   Content _editDocx() {
     const nameKey = 'name';
-    const valueKey = 'name';
+    const valueKey = 'value';
 
     Content content = Content();
     content.add(TextContent(nameKey, rifa.name));
