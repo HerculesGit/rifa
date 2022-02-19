@@ -25,8 +25,7 @@ class HomeScreen extends GetView<HomeController> {
             () => Column(
               children: [
                 const SizedBox(height: kLayoutMargin),
-                Image.asset('$kImageAssets/pombos.png',
-                    width: Get.context!.width / 2),
+                _buildImageContainer(),
                 const SizedBox(height: kLayoutMargin),
                 const Text(
                   'Coloque o nome e abaixo coloque o número escolhido',
@@ -53,6 +52,16 @@ class HomeScreen extends GetView<HomeController> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildImageContainer() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const SizedBox(width: kLayoutMargin - 5),
+        Image.asset('$kImageAssets/pombos.png', width: Get.context!.width / 2),
+      ],
     );
   }
 
