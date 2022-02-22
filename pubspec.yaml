@@ -18,6 +18,7 @@ dependencies:
   docx_template: ^0.3.2
   path_provider:
   permission_handler:
+  printing: ^5.7.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,6 +1,6 @@
 class Rifa {
   String name;
-  String chooseNumber;
+  String number;
 
-  Rifa({required this.name, required this.chooseNumber});
+  Rifa({required this.name, required this.number});
 }

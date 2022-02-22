@@ -8,9 +8,10 @@ import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:rifa/core/contants/path_constants.dart';
 import 'package:rifa/models/ticket.dart';
+import 'package:rifa/service/path_manager.dart';
 
 class HomeController extends GetxController {
-  final Rifa rifa = Rifa(chooseNumber: '', name: '');
+  final Rifa rifa = Rifa(number: '', name: '');
 
   final folderName = chaRifaPath;
   final String sourcePathTemplateDocx = '$kDocxAssets/template.docx';
@@ -22,7 +23,7 @@ class HomeController extends GetxController {
   /// simples methods
   setName(String name) => rifa.name = name;
 
-  setNumber(String number) => rifa.chooseNumber = number;
+  setNumber(String number) => rifa.number = number;
 
   /// create docx
   createOutputDocx() async {
@@ -45,7 +46,7 @@ class HomeController extends GetxController {
 
     Content content = Content();
     content.add(TextContent(nameKey, rifa.name));
-    content.add(TextContent(valueKey, rifa.chooseNumber));
+    content.add(TextContent(valueKey, rifa.number));
     return content;
   }
 
@@ -53,8 +54,7 @@ class HomeController extends GetxController {
     final bytes = await _getTemplateDocxFromAssets();
     final docx = await DocxTemplate.fromBytes(bytes);
 
-    final String outputPath =
-        '$folderName/${rifa.name}_${rifa.chooseNumber}.docx';
+    final outputPath = await PathManager.getOutputPath(rifa);
 
     final d = await docx.generate(content);
     final of = File(outputPath);
@@ -82,12 +82,12 @@ class HomeController extends GetxController {
 
   void enableButton() => buttonEnabled.value = true;
 
-  void showSuccessToast() => showToast(
-      'Docx salvo em Download/rifa/${rifa.name}_${rifa.chooseNumber}.docx',
-      textStyle: const TextStyle(color: Colors.white),
-      position: ToastPosition.bottom,
-      backgroundColor: Colors.black87,
-      duration: const Duration(seconds: 3),
-      textPadding:
-          const EdgeInsets.symmetric(vertical: 10.0, horizontal: 32.0));
+  void showSuccessToast() =>
+      showToast('Docx salvo em ${PathManager.getOutputPath(rifa)}',
+          textStyle: const TextStyle(color: Colors.white),
+          position: ToastPosition.bottom,
+          backgroundColor: Colors.black87,
+          duration: const Duration(seconds: 3),
+          textPadding:
+              const EdgeInsets.symmetric(vertical: 10.0, horizontal: 32.0));
 }

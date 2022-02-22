@@ -10,6 +10,10 @@ import 'home_controller.dart';
 import 'widgets/button_generate_receipt.dart';
 import 'widgets/m_text_form_field.dart';
 
+@Deprecated("""
+[HomeScreen] is being deprecated in favor of [PrintPreviewScreen]. [HomeScreen]
+will be removed on or after the 3.0.0 release.
+""")
 class HomeScreen extends GetView<HomeController> {
   HomeScreen({Key? key}) : super(key: key);
 
