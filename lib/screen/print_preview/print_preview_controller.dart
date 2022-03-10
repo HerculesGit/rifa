@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:printing/printing.dart';
 import 'package:rifa/core/contants/path_constants.dart';
 import 'package:rifa/models/ticket.dart';
@@ -15,6 +16,7 @@ class PrintPreviewController extends GetxController {
 
   var isLoading = false.obs;
   var buttonEnabled = false.obs;
+  bool requestPermissionAgain = true;
 
   @override
   void onInit() {
@@ -35,7 +37,7 @@ class PrintPreviewController extends GetxController {
       await Printing.sharePdf(bytes: await pdf.save(), filename: name);
       hideLoading();
     } else {
-      showSuccessToast('Ops! Preencha os campos obrigatórios');
+      showInfoToast('Ops! Preencha os campos obrigatórios');
     }
   }
 
@@ -47,25 +49,56 @@ class PrintPreviewController extends GetxController {
       //await Printing.sharePdf(bytes: await pdf.save(), filename: name);
       hideLoading();
     } else {
-      showSuccessToast('Ops! Preencha os campos obrigatórios');
+      showInfoToast('Ops! Preencha os campos obrigatórios');
     }
   }
 
   savePdfAtDevice(GlobalKey<FormState> formKey) async {
+    await requestPermission();
+
+    if (requestPermissionAgain) {
+      showInfoToast(
+          'Ops! É necessário dar permissão ao app para salvar o arquivo localmente');
+      return;
+    }
+
     if (_validate(formKey)) {
       showLoading();
       final path = await PathManager.getOutputPath(rifa.value);
       await PathManager.saveFileOnDevice(path, await pdf.save());
       hideLoading();
-      showSuccessToast('Docx salvo em $path');
+      showInfoToast('Docx salvo em $path');
     } else {
-      showSuccessToast('Ops! Preencha os campos obrigatórios');
+      showInfoToast('Ops! Preencha os campos obrigatórios');
+    }
+  }
+
+  requestPermission() async {
+    requestPermissionAgain = false;
+    final PermissionStatus storagePermissionStatus =
+        await Permission.storage.request();
+    final PermissionStatus manageExternalStoragePermissionStatus =
+        await Permission.manageExternalStorage.request();
+    final PermissionStatus accessMediaLocationPermissionStatus =
+        await Permission.accessMediaLocation.request();
+    final PermissionStatus mediaLibraryPermissionStatus =
+        await Permission.mediaLibrary.request();
+
+    if (storagePermissionStatus.isDenied ||
+        storagePermissionStatus.isPermanentlyDenied ||
+        manageExternalStoragePermissionStatus.isDenied ||
+        manageExternalStoragePermissionStatus.isPermanentlyDenied ||
+        accessMediaLocationPermissionStatus.isDenied ||
+        accessMediaLocationPermissionStatus.isPermanentlyDenied ||
+        mediaLibraryPermissionStatus.isDenied ||
+        mediaLibraryPermissionStatus.isPermanentlyDenied) {
+      requestPermissionAgain = true;
     }
   }
 
   _validate(GlobalKey<FormState> formKey) => formKey.currentState!.validate();
 
-  void showSuccessToast(String message) => showToast(message,
+  void showInfoToast(String message) => showToast(message,
       textStyle: const TextStyle(color: Colors.white),
       position: ToastPosition.bottom,
       backgroundColor: Colors.black87,
